@@ -39,7 +39,6 @@ model ApiKey {
   commentAccess   ApiKeyReadWrite @default(NONE)
   projectAccess   ApiKeyReadWrite @default(NONE)
   workspaceAccess ApiKeyReadWrite @default(NONE)
-  userAccess      ApiKeyReadWrite @default(NONE)
 
   @@unique([userId, clientId])
 }
