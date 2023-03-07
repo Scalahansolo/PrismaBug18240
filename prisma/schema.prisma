@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+enum UserType {
+  NORMAL
+  PENDING_INVITED
+}
+
+model User {
+  id                          String                        @id
+  type                        UserType                      @default(NORMAL)
+  apiKey                      ApiKey[]                      @relation(name: "userApiKeys")
+}
+
+enum ApiKeyReadWrite {
+  NONE
+  READ
+  WRITE
+}
+
+model ApiKey {
+  id              String          @id @default(uuid())
+  createdTime     DateTime        @default(now())
+  updatedTime     DateTime        @updatedAt
+  clientId        String
+  hashedKey       String          @unique
+  userId          String
+  user            User            @relation(name: "userApiKeys", fields: [userId], references: [id], onDelete: Cascade)
+  taskAccess      ApiKeyReadWrite @default(NONE)
+  commentAccess   ApiKeyReadWrite @default(NONE)
+  projectAccess   ApiKeyReadWrite @default(NONE)
+  workspaceAccess ApiKeyReadWrite @default(NONE)
+  userAccess      ApiKeyReadWrite @default(NONE)
+
+  @@unique([userId, clientId])
+}
